@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mensaje Final ❤️</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Dancing Script', cursive;
+      background: black;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    .message {
+      z-index: 2;
+      font-size: clamp(1.5rem, 4vw, 3rem);
+      padding: 0 20px;
+      text-shadow: 0 0 15px rgba(255,255,255,0.7);
+      max-width: 90%;
+    }
+    .back-button {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 12px 25px;
+      font-size: 1.2rem;
+      border: 2px solid white;
+      border-radius: 30px;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+      z-index: 5;
+      transition: all 0.3s ease;
+    }
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.4);
+      transform: translateX(-50%) scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="message">
+    Feliz día de la novia, aunque aún no lo somos oficialmente,<br>
+    tú te has convertido en esa persona que quiero en mi vida siempre,<br>
+    esa persona que se ganó mi corazón,<br>
+    esa persona que me hace sentir,<br>
+    <strong>te amo...</strong>
+  </div>
+  <a href="index.html" class="back-button">Volver</a>
+  <canvas id="meteors"></canvas>
+  <script>
+    const canvas = document.getElementById('meteors');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const stars = Array.from({ length: 150 }).map(() => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      radius: Math.random() * 1.5,
+      alpha: Math.random(),
+      delta: Math.random() * 0.02 + 0.01
+    }));
+
+    let meteors = [];
+
+    function createMeteor() {
+      meteors.push({
+        x: Math.random() * canvas.width,
+        y: -20,
+        length: Math.random() * 80 + 50,
+        speed: Math.random() * 8 + 4,
+        opacity: Math.random() * 0.5 + 0.5
+      });
+    }
+
+    function drawStars() {
+      stars.forEach(star => {
+        star.alpha += star.delta;
+        if (star.alpha <= 0 || star.alpha >= 1) star.delta = -star.delta;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+        ctx.fill();
+      });
+    }
+
+    function drawMeteor(meteor) {
+      const grad = ctx.createLinearGradient(meteor.x, meteor.y, meteor.x - meteor.length, meteor.y + meteor.length);
+      grad.addColorStop(0, `rgba(255,255,255,${meteor.opacity})`);
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.beginPath();
+      ctx.moveTo(meteor.x, meteor.y);
+      ctx.lineTo(meteor.x - meteor.length, meteor.y + meteor.length);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      drawStars();
+
+      meteors.forEach((meteor, index) => {
+        meteor.x -= meteor.speed;
+        meteor.y += meteor.speed;
+        drawMeteor(meteor);
+        if (meteor.y > canvas.height + meteor.length) {
+          meteors.splice(index, 1);
+        }
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    setInterval(createMeteor, 300);
+    animate();
+  </script>
+</body>
+</html>

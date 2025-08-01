@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Para Sophia ❤️</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Dancing Script', cursive;
+      background: black;
+      height: 100vh;
+      width: 100vw;
+    }
+    .space-background {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    .letter {
+      width: 90%;
+      max-width: 400px;
+      aspect-ratio: 3 / 2;
+      perspective: 1000px;
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+    .front {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, #ffcccc, #ffe6e6);
+      border-radius: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      padding: 1rem;
+      box-shadow: 0 4px 15px rgba(255,255,255,0.5);
+      backdrop-filter: blur(5px);
+    }
+    .content-hidden {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      overflow: hidden;
+    }
+    .content-visible {
+      display: block;
+    }
+    .phrases, .photos {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .phrase {
+      position: absolute;
+      font-size: clamp(1rem, 3vw, 2rem);
+      font-weight: bold;
+      transform: translateZ(0);
+      white-space: nowrap;
+      animation: popOut 3s ease-out forwards;
+      opacity: 0;
+      text-shadow: 0 0 10px rgba(255,255,255,0.8);
+    }
+    .photos img {
+      position: absolute;
+      width: clamp(60px, 20vw, 120px);
+      height: clamp(60px, 20vw, 120px);
+      border-radius: 15px;
+      object-fit: cover;
+      border: 2px solid white;
+      transform: translateZ(0);
+      animation: popOut 4s ease-out forwards;
+      opacity: 0;
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+    @keyframes popOut {
+      0% {
+        transform: translate(-50%, -50%) scale(2) translateZ(0);
+        opacity: 1;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(0.5) translateZ(500px);
+        opacity: 0;
+      }
+    }
+    .final-button {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 12px 25px;
+      font-size: 1.2rem;
+      border: 2px solid white;
+      border-radius: 30px;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+      z-index: 5;
+      transition: all 0.3s ease;
+    }
+    .final-button:hover {
+      background: rgba(255, 255, 255, 0.4);
+      transform: translateX(-50%) scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="space-background">
+    <div class="letter" id="letter">
+      <div class="front">
+        <h2>Haz clic para abrir ❤️</h2>
+      </div>
+    </div>
+    <div class="content-hidden" id="content">
+      <div class="phrases" id="phrases"></div>
+      <div class="photos" id="photos">
+        <img src="foto1.jpeg" alt="Foto 1">
+        <img src="foto2.jpeg" alt="Foto 2">
+        <img src="foto3.jpeg" alt="Foto 3">
+        <img src="foto4.jpeg" alt="Foto 4">
+      </div>
+      <div id="finalButtonContainer" style="display:none;">
+        <a href="final.html" class="final-button">Mensaje Final</a>
+      </div>
+    </div>
+    <canvas id="meteors"></canvas>
+  </div>
+
+  <script>
+    const letter = document.getElementById('letter');
+    const content = document.getElementById('content');
+    const phrasesContainer = document.getElementById('phrases');
+    const photosContainer = document.getElementById('photos');
+
+    const phrases = ["Te Amo", "Mi amor", "Me encantas", "Preciosa", "Hermosa", "Mi niña", "Amor de mi vida"];
+    const colors = ["#ff69b4", "#FFD700", "#00FFFF", "#ADFF2F", "#FF4500", "#00FF7F"];
+
+    letter.addEventListener('click', () => {
+      letter.style.display = 'none';
+      content.classList.add('content-visible');
+      document.getElementById('finalButtonContainer').style.display = 'block';
+      spawnPhrases();
+      scatterPhotos();
+      startSpaceAnimation();
+    });
+
+    function spawnPhrases() {
+      setInterval(() => {
+        const phrase = document.createElement('div');
+        phrase.className = 'phrase';
+        phrase.innerText = phrases[Math.floor(Math.random() * phrases.length)];
+        phrase.style.color = colors[Math.floor(Math.random() * colors.length)];
+        phrase.style.left = Math.random() * 100 + '%';
+        phrase.style.top = Math.random() * 100 + '%';
+        phrasesContainer.appendChild(phrase);
+
+        setTimeout(() => {
+          phrase.remove();
+        }, 3000);
+      }, 200);
+    }
+
+    function scatterPhotos() {
+      const photos = photosContainer.querySelectorAll('img');
+      setInterval(() => {
+        photos.forEach(photo => {
+          const clone = photo.cloneNode();
+          const randomX = Math.random() * 100;
+          const randomY = Math.random() * 100;
+          clone.style.left = `${randomX}%`;
+          clone.style.top = `${randomY}%`;
+          photosContainer.appendChild(clone);
+          setTimeout(() => {
+            clone.remove();
+          }, 4000);
+        });
+      }, 3000);
+    }
+
+    function startSpaceAnimation() {
+      const canvas = document.getElementById('meteors');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const stars = Array.from({ length: 150 }).map(() => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 1.5,
+        alpha: Math.random(),
+        delta: Math.random() * 0.02 + 0.01
+      }));
+
+      let meteors = [];
+
+      function createMeteor() {
+        meteors.push({
+          x: Math.random() * canvas.width,
+          y: -20,
+          length: Math.random() * 80 + 50,
+          speed: Math.random() * 8 + 4,
+          opacity: Math.random() * 0.5 + 0.5
+        });
+      }
+
+      function drawStars() {
+        stars.forEach(star => {
+          star.alpha += star.delta;
+          if (star.alpha <= 0 || star.alpha >= 1) star.delta = -star.delta;
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+          ctx.fill();
+        });
+      }
+
+      function drawMeteor(meteor) {
+        const grad = ctx.createLinearGradient(meteor.x, meteor.y, meteor.x - meteor.length, meteor.y + meteor.length);
+        grad.addColorStop(0, `rgba(255,255,255,${meteor.opacity})`);
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.beginPath();
+        ctx.moveTo(meteor.x, meteor.y);
+        ctx.lineTo(meteor.x - meteor.length, meteor.y + meteor.length);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      function animate() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        drawStars();
+
+        meteors.forEach((meteor, index) => {
+          meteor.x -= meteor.speed;
+          meteor.y += meteor.speed;
+          drawMeteor(meteor);
+          if (meteor.y > canvas.height + meteor.length) {
+            meteors.splice(index, 1);
+          }
+        });
+
+        requestAnimationFrame(animate);
+      }
+
+      setInterval(createMeteor, 300);
+      animate();
+    }
+  </script>
+</body>
+</html>
