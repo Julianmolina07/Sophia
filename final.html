@@ -12,13 +12,15 @@
       overflow: hidden;
       font-family: 'Dancing Script', cursive;
       background: black;
-      height: 100vh;
-      width: 100vw;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      height: 100%;
+      width: 100%;
       color: white;
-      text-align: center;
+    }
+    .space-background {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
     }
     canvas {
       position: absolute;
@@ -28,16 +30,22 @@
       height: 100%;
       z-index: 0;
     }
-    .message {
+    .final-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
       z-index: 2;
-      font-size: clamp(1.5rem, 4vw, 3rem);
-      padding: 0 20px;
-      text-shadow: 0 0 15px rgba(255,255,255,0.7);
-      max-width: 90%;
     }
     .back-button {
       position: absolute;
-      bottom: 30px;
+      bottom: 5%;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.2);
@@ -48,7 +56,7 @@
       border-radius: 30px;
       text-decoration: none;
       backdrop-filter: blur(10px);
-      z-index: 5;
+      z-index: 3;
       transition: all 0.3s ease;
     }
     .back-button:hover {
@@ -58,84 +66,90 @@
   </style>
 </head>
 <body>
-  <div class="message">
-    Feliz día de la novia, aunque aún no lo somos oficialmente,<br>
-    tú te has convertido en esa persona que quiero en mi vida siempre,<br>
-    esa persona que se ganó mi corazón,<br>
-    esa persona que me hace sentir,<br>
-    <strong>te amo...</strong>
+  <div class="space-background">
+    <canvas id="meteors"></canvas>
+    <div class="final-message">
+      <p>Feliz día de la novia, aunque aún no lo somos oficialmente...</p>
+      <p>Tú te has convertido en esa persona que quiero en mi vida siempre,</p>
+      <p>esa persona que se ganó mi corazón,</p>
+      <p>esa persona que me hace sentir, te amo...</p>
+    </div>
+    <a href="index.html" class="back-button">Volver</a>
   </div>
-  <a href="index.html" class="back-button">Volver</a>
-  <canvas id="meteors"></canvas>
+
   <script>
-    const canvas = document.getElementById('meteors');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    function startSpaceAnimation() {
+      const canvas = document.getElementById('meteors');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-    const stars = Array.from({ length: 150 }).map(() => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      radius: Math.random() * 1.5,
-      alpha: Math.random(),
-      delta: Math.random() * 0.02 + 0.01
-    }));
-
-    let meteors = [];
-
-    function createMeteor() {
-      meteors.push({
+      const stars = Array.from({ length: 150 }).map(() => ({
         x: Math.random() * canvas.width,
-        y: -20,
-        length: Math.random() * 80 + 50,
-        speed: Math.random() * 8 + 4,
-        opacity: Math.random() * 0.5 + 0.5
-      });
-    }
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 1.5,
+        alpha: Math.random(),
+        delta: Math.random() * 0.02 + 0.01
+      }));
 
-    function drawStars() {
-      stars.forEach(star => {
-        star.alpha += star.delta;
-        if (star.alpha <= 0 || star.alpha >= 1) star.delta = -star.delta;
+      let meteors = [];
+
+      function createMeteor() {
+        meteors.push({
+          x: Math.random() * canvas.width,
+          y: -20,
+          length: Math.random() * 80 + 50,
+          speed: Math.random() * 8 + 4,
+          opacity: Math.random() * 0.5 + 0.5
+        });
+      }
+
+      function drawStars() {
+        stars.forEach(star => {
+          star.alpha += star.delta;
+          if (star.alpha <= 0 || star.alpha >= 1) star.delta = -star.delta;
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+          ctx.fill();
+        });
+      }
+
+      function drawMeteor(meteor) {
+        const grad = ctx.createLinearGradient(meteor.x, meteor.y, meteor.x - meteor.length, meteor.y + meteor.length);
+        grad.addColorStop(0, `rgba(255,255,255,${meteor.opacity})`);
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
         ctx.beginPath();
-        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
-        ctx.fill();
-      });
+        ctx.moveTo(meteor.x, meteor.y);
+        ctx.lineTo(meteor.x - meteor.length, meteor.y + meteor.length);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      function animate() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        drawStars();
+
+        meteors.forEach((meteor, index) => {
+          meteor.x -= meteor.speed;
+          meteor.y += meteor.speed;
+          drawMeteor(meteor);
+          if (meteor.y > canvas.height + meteor.length) {
+            meteors.splice(index, 1);
+          }
+        });
+
+        requestAnimationFrame(animate);
+      }
+
+      setInterval(createMeteor, 300);
+      animate();
     }
 
-    function drawMeteor(meteor) {
-      const grad = ctx.createLinearGradient(meteor.x, meteor.y, meteor.x - meteor.length, meteor.y + meteor.length);
-      grad.addColorStop(0, `rgba(255,255,255,${meteor.opacity})`);
-      grad.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.beginPath();
-      ctx.moveTo(meteor.x, meteor.y);
-      ctx.lineTo(meteor.x - meteor.length, meteor.y + meteor.length);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-
-    function animate() {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      drawStars();
-
-      meteors.forEach((meteor, index) => {
-        meteor.x -= meteor.speed;
-        meteor.y += meteor.speed;
-        drawMeteor(meteor);
-        if (meteor.y > canvas.height + meteor.length) {
-          meteors.splice(index, 1);
-        }
-      });
-
-      requestAnimationFrame(animate);
-    }
-
-    setInterval(createMeteor, 300);
-    animate();
+    startSpaceAnimation();
   </script>
 </body>
 </html>
