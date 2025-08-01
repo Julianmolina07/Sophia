@@ -2,24 +2,29 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Para Sophia ❤️</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Sophia ❤️</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
   <style>
-    body, html {
+    html, body {
       margin: 0;
       padding: 0;
-      overflow: hidden;
-      font-family: 'Dancing Script', cursive;
-      background: black;
-      height: 100%;
       width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: black;
+      font-family: 'Dancing Script', cursive;
     }
     .space-background {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
     }
     canvas {
       position: absolute;
@@ -35,10 +40,9 @@
       aspect-ratio: 3 / 2;
       perspective: 1000px;
       cursor: pointer;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       z-index: 2;
     }
     .front {
@@ -79,7 +83,6 @@
       position: absolute;
       font-size: clamp(1rem, 3vw, 2rem);
       font-weight: bold;
-      transform: translateZ(0);
       white-space: nowrap;
       animation: popOut 3s ease-out forwards;
       opacity: 0;
@@ -87,12 +90,11 @@
     }
     .photos img {
       position: absolute;
-      width: clamp(60px, 20vw, 120px);
-      height: clamp(60px, 20vw, 120px);
+      width: clamp(60px, 20vw, 100px);
+      height: clamp(60px, 20vw, 100px);
       border-radius: 15px;
       object-fit: cover;
       border: 2px solid white;
-      transform: translateZ(0);
       animation: popOut 4s ease-out forwards;
       opacity: 0;
       box-shadow: 0 0 10px rgba(255,255,255,0.5);
@@ -105,7 +107,7 @@
       background: rgba(255, 255, 255, 0.2);
       color: #fff;
       padding: 12px 25px;
-      font-size: 1.2rem;
+      font-size: clamp(1rem, 4vw, 1.2rem);
       border: 2px solid white;
       border-radius: 30px;
       text-decoration: none;
@@ -119,7 +121,7 @@
     }
     @keyframes popOut {
       0% {
-        transform: translate(-50%, -50%) scale(2) translateZ(0);
+        transform: translate(-50%, -50%) scale(2);
         opacity: 1;
       }
       50% {
@@ -134,6 +136,7 @@
 </head>
 <body>
   <div class="space-background">
+    <canvas id="meteors"></canvas>
     <div class="letter" id="letter">
       <div class="front">
         <h2>Haz clic para abrir ❤️</h2>
@@ -149,7 +152,6 @@
       </div>
       <a href="final.html" class="final-button">Mensaje Final</a>
     </div>
-    <canvas id="meteors"></canvas>
   </div>
 
   <audio id="popSound" src="pop.mp3" preload="auto"></audio>
@@ -179,8 +181,8 @@
         phrase.className = 'phrase';
         phrase.innerText = phrases[Math.floor(Math.random() * phrases.length)];
         phrase.style.color = colors[Math.floor(Math.random() * colors.length)];
-        phrase.style.left = Math.random() * 100 + '%';
-        phrase.style.top = Math.random() * 100 + '%';
+        phrase.style.left = Math.random() * 90 + 5 + '%';
+        phrase.style.top = Math.random() * 90 + 5 + '%';
         phrasesContainer.appendChild(phrase);
 
         setTimeout(() => {
@@ -194,8 +196,8 @@
       setInterval(() => {
         photos.forEach(photo => {
           const clone = photo.cloneNode();
-          clone.style.left = Math.random() * 100 + '%';
-          clone.style.top = Math.random() * 100 + '%';
+          clone.style.left = Math.random() * 90 + 5 + '%';
+          clone.style.top = Math.random() * 90 + 5 + '%';
           photosContainer.appendChild(clone);
           setTimeout(() => {
             clone.remove();
